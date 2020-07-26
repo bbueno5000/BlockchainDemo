@@ -4,6 +4,11 @@ DOCSTRING
 import hashlib
 import time
 
+GENESIS_INDEX = 0
+GENESIS_PREVIOUS_HASH = '0'
+GENESIS_TIMESTAMP = 1495851743
+GENESIS_DATA = 'first block'
+
 class Block():
     """
     DOCSTRING
@@ -20,7 +25,7 @@ class Block():
 
     @classmethod
     def genesis_block(cls):
-        params = block_params.BlockParams.genesis_params()
+        params = BlockParams.genesis_params()
         return cls(params)
 
     def has_valid_hash(self):
@@ -33,7 +38,7 @@ class Block():
         return self.previous_hash == previous_block.hash
 
     def params(self):
-        return block_params.BlockParams(
+        return BlockParams(
             self.index,
             self.previous_hash,
             self.timestamp,
@@ -47,20 +52,26 @@ class BlockChain():
         self.blockchain_store = self.fetch_blockchain()
 
     def fetch_blockchain(self):
-        return [block.Block.genesis_block()]
+        return [Block.genesis_block()]
     
     def generate_next_block(self, data):
+        """
+        DOCSTRING
+        """
         index = len(self.blockchain_store)
         previous_hash = self.latest_block().hash
         timestamp = int(time.time())
-        params = block_params.BlockParams(index, previous_hash, timestamp, data)
-        new_block = block.Block(params)
+        params = BlockParams(index, previous_hash, timestamp, data)
+        new_block = Block(params)
         self.blockchain_store.append(new_block)
 
     def latest_block(self):
         return self.blockchain_store[-1]
     
     def receive_new_block(self, new_block):
+        """
+        DOCSTRING
+        """
         previous_block = self.latest_block()
         if not new_block.has_valid_index(previous_block):
             print('invalid index')
@@ -72,11 +83,6 @@ class BlockChain():
             print('invalid hash')
             return
         self.blockchain_store.append(new_block)
-
-GENESIS_INDEX = 0
-GENESIS_PREVIOUS_HASH = '0'
-GENESIS_TIMESTAMP = 1495851743
-GENESIS_DATA = 'first block'
 
 class BlockParams:
     """
